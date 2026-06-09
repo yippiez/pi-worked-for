@@ -2,7 +2,7 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { Text } from "@earendil-works/pi-tui";
 
 const WIDGET_ID = "pi-worked-for";
-const DEFAULT_VISIBLE_MS = 5000;
+const VISIBLE_MS = 5000;
 
 type State = {
 	startedAt: number | undefined;
@@ -13,13 +13,6 @@ const state: State = {
 	startedAt: undefined,
 	clearTimer: undefined,
 };
-
-function getVisibleMs(): number {
-	const raw = process.env.PI_WORKED_FOR_VISIBLE_MS;
-	if (!raw) return DEFAULT_VISIBLE_MS;
-	const parsed = Number(raw);
-	return Number.isFinite(parsed) && parsed >= 0 ? parsed : DEFAULT_VISIBLE_MS;
-}
 
 function formatDuration(ms: number): string {
 	const seconds = Math.max(1, Math.round(ms / 1000));
@@ -40,10 +33,9 @@ function formatDuration(ms: number): string {
 }
 
 function clearTimer() {
-	if (state.clearTimer) {
-		clearTimeout(state.clearTimer);
-		state.clearTimer = undefined;
-	}
+	if (!state.clearTimer) return;
+	clearTimeout(state.clearTimer);
+	state.clearTimer = undefined;
 }
 
 export default function (pi: ExtensionAPI) {
@@ -65,14 +57,11 @@ export default function (pi: ExtensionAPI) {
 			{ placement: "belowEditor" },
 		);
 
-		const visibleMs = getVisibleMs();
-		if (visibleMs > 0) {
-			state.clearTimer = setTimeout(() => {
-				ctx.ui.setWidget(WIDGET_ID, undefined);
-				state.clearTimer = undefined;
-			}, visibleMs);
-			state.clearTimer.unref?.();
-		}
+		state.clearTimer = setTimeout(() => {
+			ctx.ui.setWidget(WIDGET_ID, undefined);
+			state.clearTimer = undefined;
+		}, VISIBLE_MS);
+		state.clearTimer.unref?.();
 	});
 
 	pi.on("session_shutdown", async (_event, ctx) => {
