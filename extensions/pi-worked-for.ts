@@ -2,6 +2,7 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { Text } from "@earendil-works/pi-tui";
 
 const WIDGET_ID = "pi-worked-for";
+const ICON = "◴";
 
 type State = {
 	startedAt: number | undefined;
@@ -40,7 +41,7 @@ export default function (pi: ExtensionAPI) {
 		state.startedAt = undefined;
 		if (!startedAt || !ctx.hasUI) return;
 
-		const text = `Worked for ${formatDuration(Date.now() - startedAt)}`;
+		const text = `  ${ICON} Worked for ${formatDuration(Date.now() - startedAt)} `;
 		ctx.ui.setWidget(WIDGET_ID, (_tui, theme) => new Text(theme.fg("muted", text), 0, 0));
 	});
 
