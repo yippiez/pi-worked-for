@@ -2,16 +2,13 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { Text } from "@earendil-works/pi-tui";
 
 const WIDGET_ID = "pi-worked-for";
-const VISIBLE_MS = 5000;
 
 type State = {
 	startedAt: number | undefined;
-	clearTimer: NodeJS.Timeout | undefined;
 };
 
 const state: State = {
 	startedAt: undefined,
-	clearTimer: undefined,
 };
 
 function formatDuration(ms: number): string {
@@ -32,15 +29,8 @@ function formatDuration(ms: number): string {
 	return "1 second";
 }
 
-function clearTimer() {
-	if (!state.clearTimer) return;
-	clearTimeout(state.clearTimer);
-	state.clearTimer = undefined;
-}
-
 export default function (pi: ExtensionAPI) {
 	pi.on("agent_start", async (_event, ctx) => {
-		clearTimer();
 		ctx.ui.setWidget(WIDGET_ID, undefined);
 		state.startedAt = Date.now();
 	});
@@ -51,21 +41,10 @@ export default function (pi: ExtensionAPI) {
 		if (!startedAt || !ctx.hasUI) return;
 
 		const text = `Worked for ${formatDuration(Date.now() - startedAt)}`;
-		ctx.ui.setWidget(
-			WIDGET_ID,
-			(_tui, theme) => new Text(theme.fg("muted", text), 0, 0),
-			{ placement: "belowEditor" },
-		);
-
-		state.clearTimer = setTimeout(() => {
-			ctx.ui.setWidget(WIDGET_ID, undefined);
-			state.clearTimer = undefined;
-		}, VISIBLE_MS);
-		state.clearTimer.unref?.();
+		ctx.ui.setWidget(WIDGET_ID, (_tui, theme) => new Text(theme.fg("muted", text), 0, 0));
 	});
 
 	pi.on("session_shutdown", async (_event, ctx) => {
-		clearTimer();
 		ctx.ui.setWidget(WIDGET_ID, undefined);
 	});
 }
