@@ -40,7 +40,7 @@ export default function (pi: ExtensionAPI) {
 		state.startedAt = undefined;
 		if (!startedAt || !ctx.hasUI) return;
 
-		const text = `  Worked for ${formatDuration(Date.now() - startedAt)} `;
+		const text = ` Worked for ${formatDuration(Date.now() - startedAt)}\n`;
 		ctx.ui.setWidget(WIDGET_ID, (_tui, theme) => new Text(theme.fg("muted", text), 0, 0));
 	});
 

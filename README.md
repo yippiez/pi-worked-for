@@ -5,7 +5,7 @@ Pi extension that shows a visual elapsed-time line after each prompt finishes.
 Format:
 
 ```text
-  Worked for 3 minutes 
+ Worked for 3 minutes\n
 ```
 
 The line is a TUI widget shown above the editor until the next prompt starts. It is not added to transcript history and is not sent back to the model.
