@@ -2,6 +2,45 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { Text } from "@earendil-works/pi-tui";
 
 const WIDGET_ID = "pi-worked-for";
+const VERBS = [
+	"Sautéed",
+	"Churned",
+	"Simmered",
+	"Braised",
+	"Whisked",
+	"Kneaded",
+	"Baked",
+	"Toiled",
+	"Schemed",
+	"Cogitated",
+	"Ruminated",
+	"Pondered",
+	"Conjured",
+	"Brewed",
+	"Steeped",
+	"Marinated",
+	"Roasted",
+	"Smelted",
+	"Forged",
+	"Tinkered",
+	"Milled",
+	"Distilled",
+	"Fermented",
+	"Pickled",
+	"Reduced",
+	"Caramelized",
+	"Proofed",
+	"Griddled",
+	"Poached",
+	"Blanched",
+	"Julienned",
+	"Zested",
+	"Tempered",
+	"Percolated",
+	"Infused",
+	"Decanted",
+	"Hummed",
+] as const;
 
 type State = {
 	startedAt: number | undefined;
@@ -10,6 +49,10 @@ type State = {
 const state: State = {
 	startedAt: undefined,
 };
+
+function randomVerb(): string {
+	return VERBS[Math.floor(Math.random() * VERBS.length)] ?? "Worked";
+}
 
 function formatDuration(ms: number): string {
 	const seconds = Math.max(1, Math.round(ms / 1000));
@@ -53,7 +96,7 @@ export default function (pi: ExtensionAPI) {
 		state.startedAt = undefined;
 		if (!startedAt || !ctx.hasUI) return;
 
-		const text = ` Worked for ${formatDuration(Date.now() - startedAt)}\n`;
+		const text = ` ${randomVerb()} for ${formatDuration(Date.now() - startedAt)}\n`;
 		ctx.ui.setWidget(WIDGET_ID, (_tui, theme) => new Text(theme.fg("muted", text), 0, 0));
 	});
 
