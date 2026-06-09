@@ -1,15 +1,25 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { Text } from "@earendil-works/pi-tui";
 
-const CUSTOM_TYPE = "pi-worked-for";
+const WIDGET_ID = "pi-worked-for";
+const DEFAULT_VISIBLE_MS = 5000;
 
 type State = {
 	startedAt: number | undefined;
+	clearTimer: NodeJS.Timeout | undefined;
 };
 
 const state: State = {
 	startedAt: undefined,
+	clearTimer: undefined,
 };
+
+function getVisibleMs(): number {
+	const raw = process.env.PI_WORKED_FOR_VISIBLE_MS;
+	if (!raw) return DEFAULT_VISIBLE_MS;
+	const parsed = Number(raw);
+	return Number.isFinite(parsed) && parsed >= 0 ? parsed : DEFAULT_VISIBLE_MS;
+}
 
 function formatDuration(ms: number): string {
 	const seconds = Math.max(1, Math.round(ms / 1000));
@@ -29,34 +39,44 @@ function formatDuration(ms: number): string {
 	return "1 second";
 }
 
-function contentText(content: unknown): string {
-	if (typeof content === "string") return content;
-	if (!Array.isArray(content)) return "";
-	return content
-		.filter((part): part is { type: "text"; text: string } => part?.type === "text" && typeof part.text === "string")
-		.map((part) => part.text)
-		.join("\n");
+function clearTimer() {
+	if (state.clearTimer) {
+		clearTimeout(state.clearTimer);
+		state.clearTimer = undefined;
+	}
 }
 
 export default function (pi: ExtensionAPI) {
-	pi.registerMessageRenderer(CUSTOM_TYPE, (message, _options, theme) => {
-		return new Text(theme.fg("muted", contentText(message.content)), 0, 0);
-	});
-
-	pi.on("agent_start", async () => {
+	pi.on("agent_start", async (_event, ctx) => {
+		clearTimer();
+		ctx.ui.setWidget(WIDGET_ID, undefined);
 		state.startedAt = Date.now();
 	});
 
-	pi.on("agent_end", async () => {
+	pi.on("agent_end", async (_event, ctx) => {
 		const startedAt = state.startedAt;
 		state.startedAt = undefined;
-		if (!startedAt) return;
+		if (!startedAt || !ctx.hasUI) return;
 
-		pi.sendMessage({
-			customType: CUSTOM_TYPE,
-			content: `◷ Worked for ${formatDuration(Date.now() - startedAt)}`,
-			display: true,
-			details: { startedAt: new Date(startedAt).toISOString(), endedAt: new Date().toISOString() },
-		});
+		const text = `◷ Worked for ${formatDuration(Date.now() - startedAt)}`;
+		ctx.ui.setWidget(
+			WIDGET_ID,
+			(_tui, theme) => new Text(theme.fg("muted", text), 0, 0),
+			{ placement: "belowEditor" },
+		);
+
+		const visibleMs = getVisibleMs();
+		if (visibleMs > 0) {
+			state.clearTimer = setTimeout(() => {
+				ctx.ui.setWidget(WIDGET_ID, undefined);
+				state.clearTimer = undefined;
+			}, visibleMs);
+			state.clearTimer.unref?.();
+		}
+	});
+
+	pi.on("session_shutdown", async (_event, ctx) => {
+		clearTimer();
+		ctx.ui.setWidget(WIDGET_ID, undefined);
 	});
 }
