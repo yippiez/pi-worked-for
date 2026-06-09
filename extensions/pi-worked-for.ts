@@ -30,6 +30,19 @@ function formatDuration(ms: number): string {
 }
 
 export default function (pi: ExtensionAPI) {
+	pi.on("input", async (_event, ctx) => {
+		ctx.ui.setWidget(WIDGET_ID, undefined);
+		return { action: "continue" };
+	});
+
+	pi.on("session_before_compact", async (_event, ctx) => {
+		ctx.ui.setWidget(WIDGET_ID, undefined);
+	});
+
+	pi.on("session_compact", async (_event, ctx) => {
+		ctx.ui.setWidget(WIDGET_ID, undefined);
+	});
+
 	pi.on("agent_start", async (_event, ctx) => {
 		ctx.ui.setWidget(WIDGET_ID, undefined);
 		state.startedAt = Date.now();
