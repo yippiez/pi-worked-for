@@ -1,3 +1,14 @@
+# Moved to pchain
+
+This repository has moved into the pchain monorepo:
+
+- https://github.com/yippiez/pchain
+- Pi implementation: `pchain/pi/`
+
+This repo is kept only for history and compatibility.
+
+---
+
 # pi-worked-for
 
 Pi extension that shows a visual elapsed-time line after each prompt finishes.
