@@ -1,30 +1,31 @@
 {
   "name": "pi-worked-for",
   "version": "0.1.0",
-  "description": "Show how long Pi worked after each completed prompt.",
+  "description": "Track how long each Pi agent run worked and expose it to compatible editors.",
   "type": "module",
   "keywords": [
-    "pi-package",
-    "pi",
-    "timer",
-    "worked-for"
+    "pi-package"
   ],
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/yippiez/pi-worked-for.git"
   },
-  "files": [
-    "extensions",
-    "README.md"
-  ],
-  "pi": {
-    "extensions": [
-      "./extensions"
-    ]
+  "scripts": {
+    "typecheck": "tsc --noEmit"
   },
+  "dependencies": {},
   "peerDependencies": {
+    "@earendil-works/pi-ai": "*",
+    "@earendil-works/pi-agent-core": "*",
     "@earendil-works/pi-coding-agent": "*",
     "@earendil-works/pi-tui": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "pi": {
+    "extensions": [
+      "./src/index.ts"
+    ]
   }
 }
