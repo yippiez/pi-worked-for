@@ -1,5 +1,5 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { WorkedForOnAgentEnd, WorkedForOnAgentStart, WorkedForOnInput, WorkedForOnSessionBeforeCompact, WorkedForOnSessionCompact, WorkedForOnSessionShutdown } from "./feature/session/worked_for.ts";
+import { WorkedForOnAgentEnd, WorkedForOnAgentStart, WorkedForOnInput, WorkedForOnSessionBeforeCompact, WorkedForOnSessionCompact, WorkedForOnSessionShutdown } from "../../src/feature/session/worked_for.ts";
 
 export default function PiWorkedForRegister(pi: ExtensionAPI): void {
 	pi.on("input", async (_event, ctx) => { WorkedForOnInput(ctx); });
